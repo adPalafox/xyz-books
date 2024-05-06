@@ -14,8 +14,14 @@ func NewBooksPresenter() *BooksPresenter {
 	return &BooksPresenter{}
 }
 
+func (i BooksPresenter) ListBooks(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": constant.ResponseOKMessage,
+	})
+}
+
 func (i BooksPresenter) GetBook(c *gin.Context) {
-	c.JSON(http.StatusMethodNotAllowed, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": constant.ResponseOKMessage,
 	})
 }
