@@ -14,6 +14,10 @@ func NewBookController(in port.BooksInputPort) BooksController {
 	return BooksController{booksInputPort: in}
 }
 
+func (i BooksController) ListBooks(c *gin.Context) {
+	_ = i.booksInputPort.ListBooks(c)
+}
+
 func (i BooksController) GetBook(c *gin.Context) {
-	print("get book api controller")
+	_ = i.booksInputPort.GetBook(c)
 }

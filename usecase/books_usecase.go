@@ -18,6 +18,11 @@ func NewBookUseCase(
 	}
 }
 
+func (i BooksUseCase) ListBooks(c *gin.Context) error {
+	i.booksPort.ListBooks(c)
+	return nil
+}
+
 func (i BooksUseCase) GetBook(c *gin.Context) error {
 	i.booksPort.GetBook(c)
 	return nil
