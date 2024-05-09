@@ -24,9 +24,10 @@ func main() {
 
 	router.LoadHTMLGlob("frontend/index.html")
 
-	book := router.Group("v1/api/books")
+	book := router.Group("v1/api/book")
 	book.GET("/list", booksController.ListBooks)
 	book.GET("/:id", booksController.GetBook)
+	book.PATCH("/:id", booksController.EditBook)
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:" + port,
