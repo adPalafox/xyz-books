@@ -25,7 +25,7 @@ func ValidateBook(c *gin.Context, book *entity.Book) error {
 	return nil
 }
 
-func ValidateAuthors(c *gin.Context, authors *[]entity.BookAuthor) error {
+func ValidateAuthors(c *gin.Context, authors *[]entity.Author) error {
 	for _, a := range *authors {
 		if a.FirstName == "" ||
 			a.LastName == "" {
