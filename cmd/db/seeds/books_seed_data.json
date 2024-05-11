@@ -1,0 +1,120 @@
+[
+    {
+        "title": "American Elf",
+        "isbn13": "9781891830853",
+        "isbn10": "1891830856",
+        "publicationyear": 2004,
+        "publisherid": 1,
+        "edition": "Book 2",
+        "listprice": 1000,
+        "authors": [
+            {
+                "id": 1,
+                "firstname": "Joel",
+                "lastname": "Hartse",
+                "middlename": null,
+                "bookid": 1
+            },
+            {
+                "id": 2,
+                "firstname": "Hannah",
+                "lastname": "Templer",
+                "middlename": "P.",
+                "bookid": 1
+            },
+            {
+                "id": 3,
+                "firstname": "Marguerite",
+                "lastname": "Duras",
+                "middlename": "Z.",
+                "bookid": 1
+            }
+        ]
+    },
+    {
+        "title": "Cosmoknights",
+        "isbn13": "9781603094542",
+        "isbn10": "1603094547",
+        "publicationyear": 2019,
+        "publisherid": 2,
+        "edition": "Book 1",
+        "listprice": 2000,
+        "authors": [
+            {
+                "id": 4,
+                "firstname": "Kingsley",
+                "lastname": "Amis",
+                "middlename": null,
+                "bookid": 2
+            }
+        ]
+    },
+    {
+        "title": "Essex County",
+        "isbn13": "9781603090384",
+        "isbn10": "160309038X",
+        "publicationyear": 1990,
+        "publisherid": 3,
+        "edition": "",
+        "listprice": 500,
+        "authors": [
+            {
+                "id": 4,
+                "firstname": "Kingsley",
+                "lastname": "Amis",
+                "middlename": null,
+                "bookid": 2
+            }
+        ]
+    },
+    {
+        "title": "Hey, Mister (Vol 1)",
+        "isbn13": "9781891830020",
+        "isbn10": "1891830023",
+        "publicationyear": 2000,
+        "publisherid": 3,
+        "edition": "After School Special",
+        "listprice": 1200,
+        "authors": [
+            {
+                "id": 2,
+                "firstname": "Hannah",
+                "lastname": "Templer",
+                "middlename": "P.",
+                "bookid": 1
+            },
+            {
+                "id": 5,
+                "firstname": "Fannie",
+                "lastname": "Peters Flagg",
+                "middlename": null,
+                "bookid": 1
+            },
+            {
+                "id": 6,
+                "firstname": "Camille",
+                "lastname": "Byron Paglia",
+                "middlename": null,
+                "bookid": 1
+            }
+        ]
+    },
+    {
+        "title": "The Underwater Welder",
+        "isbn13": "9781603093989",
+        "isbn10": "1603093982",
+        "publicationyear": 2022,
+        "publisherid": 4,
+        "edition": "",
+        "listprice": 3000,
+        "authors": [
+            {
+                "id": 7,
+                "firstname": "Rainer",
+                "lastname": "Steel Rilke",
+                "middlename": null,
+                "bookid": 1
+            }
+        ]
+    }
+]
