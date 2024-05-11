@@ -2,7 +2,7 @@ package register
 
 import (
 	"xyz-books/interface/controller"
-	"xyz-books/presenter"
+	"xyz-books/interface/presenter"
 	"xyz-books/usecase"
 )
 
