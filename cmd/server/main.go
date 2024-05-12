@@ -7,6 +7,7 @@ import (
 	"time"
 	"xyz-books/register"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +23,14 @@ func main() {
 		log.Println("PORT environment variable not set, using default port 8080")
 	}
 
-	// router.LoadHTMLGlob("frontend/index.html")
+	config := cors.Config{
+		AllowOrigins:  []string{"http://localhost:5173"},
+		AllowMethods:  []string{"PUT", "PATCH", "GET"},
+		AllowHeaders:  []string{"Origin"},
+		ExposeHeaders: []string{"Content-Length"},
+		MaxAge:        12 * time.Hour,
+	}
+	router.Use(cors.New(config))
 
 	book := router.Group("v1/api/book")
 	book.GET("/list", booksController.ListBooks)
