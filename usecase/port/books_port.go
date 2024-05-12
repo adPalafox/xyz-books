@@ -7,9 +7,9 @@ import (
 )
 
 type BooksInputPort interface {
-	ListBooks(*gin.Context)
-	GetBook(*gin.Context, *dto.GetBookInput)
-	EditBook(*gin.Context, *dto.EditBookInput)
+	ListBooks(*gin.Context, *dto.ListBookInput) error
+	GetBook(*gin.Context, *dto.GetBookInput) error
+	EditBook(*gin.Context, *dto.EditBookInput) error
 }
 
 type BooksOutputPort interface {

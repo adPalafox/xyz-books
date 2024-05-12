@@ -22,7 +22,7 @@ func main() {
 		log.Println("PORT environment variable not set, using default port 8080")
 	}
 
-	router.LoadHTMLGlob("frontend/index.html")
+	// router.LoadHTMLGlob("frontend/index.html")
 
 	book := router.Group("v1/api/book")
 	book.GET("/list", booksController.ListBooks)
