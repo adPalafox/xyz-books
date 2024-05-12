@@ -7,6 +7,7 @@ type Book struct {
 	Isbn13          *string   `json:"isbn_13"`
 	ListPrice       float32   `json:"list_price"`
 	PublicationYear int       `json:"publication_year"`
+	PublisherID     int       `json:"publisher_id"`
 	Publisher       string    `json:"publisher"`
 	ImageUrl        *string   `json:"image_url"`
 	Edition         *string   `json:"edition"`

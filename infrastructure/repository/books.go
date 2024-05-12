@@ -81,50 +81,69 @@ func (b BooksRepository) GetBookByISBN(
 	return bookRecord, nil
 }
 
-func (b BooksRepository) EditBook(c *gin.Context, in *dto.EditBookInput) error {
+func (b BooksRepository) EditBook(
+	c *gin.Context, in *dto.EditBookInput) error {
 	lg.WithContext(c).Info(constant.LogStartMessage)
 	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
 	dbClient := b.con.GetDBClient(c)
 
-	// var author dao.Author
-	// dbf := db.Where("caller = ?", in).First(&caller)
-	// if dbf.Error != nil {
-	// 	log.WithContext(c).Warn(dbf.Error)
-	// 	return er.WithContextError(
-	// 		c, http.StatusBadRequest, "caller is invalid")
-	// }
-
-	newBookRecord := dao.Book{
-		Title:           in.Book.Title,
-		Isbn10:          in.Book.Isbn10,
-		Isbn13:          in.Book.Isbn13,
-		ListPrice:       in.Book.ListPrice,
-		PublicationYear: in.Book.PublicationYear,
-		// PublisherID: ,
-		ImageUrl: in.Book.ImageUrl,
-		Edition:  in.Book.Edition,
-		// Authors: ,
+	var publisher dao.Publisher
+	dbf := dbClient.
+		Where("id = ?", in.Book.PublisherID).
+		First(&publisher)
+	if dbf.Error != nil {
+		lg.WithContext(c).Warn(dbf.Error)
+		return er.WithContextError(
+			c, http.StatusBadRequest, "publisher is invalid")
 	}
 
-	var book dao.Book
-	dbf := dbClient.Find(&book, in.Book.ID)
+	var authorsRecords []dao.Author
+	for _, a := range *in.Book.Authors {
+		var author dao.Author
+		dbf := dbClient.
+			Where("id = ?", a.ID).
+			First(&author)
+		if dbf.Error != nil {
+			lg.WithContext(c).Warn(dbf.Error)
+			return er.WithContextError(
+				c, http.StatusBadRequest, "publisher is invalid")
+		}
+		authorsRecords = append(authorsRecords, author)
+	}
+
+	var existingBook dao.Book
+	dbf = dbClient.
+		Where("isbn13 = ?", in.Book.Isbn13).
+		First(&existingBook)
 	if dbf.Error != nil {
 		lg.WithContext(c).Error(dbf.Error)
 		return er.WithContextError(
-			c, http.StatusInternalServerError, constant.ResponseInternalServerMessage)
+			c, http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
 	}
 
-	dbc := dbClient.Updates(&newBookRecord)
-	if dbc.Error != nil {
-		lg.WithContext(c).Error(dbc.Error)
+	existingBook.Title = in.Book.Title
+	existingBook.Isbn10 = in.Book.Isbn10
+	existingBook.Isbn13 = in.Book.Isbn13
+	existingBook.ListPrice = in.Book.ListPrice
+	existingBook.PublicationYear = in.Book.PublicationYear
+	existingBook.PublisherID = publisher.ID
+	existingBook.ImageUrl = in.Book.ImageUrl
+	existingBook.Edition = in.Book.Edition
+	existingBook.Authors = authorsRecords
+
+	existingBook.Authors = make([]dao.Author, 0)
+	existingBook.Authors = append(existingBook.Authors, authorsRecords...)
+
+	dbu := dbClient.
+		Where("isbn13 = ?", existingBook.Isbn13).
+		Updates(&existingBook)
+	if dbu.Error != nil {
+		lg.WithContext(c).Error(dbu.Error)
 		return er.WithContextError(
-			c, http.StatusInternalServerError, constant.ResponseInternalServerMessage)
-	}
-	if dbc.RowsAffected == 0 {
-		lg.WithContext(c).Warn(constant.ResponseNotfoundMessage)
-		return er.WithContextError(
-			c, http.StatusNotFound, constant.ResponseNotfoundMessage)
+			c, http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
 	}
 
 	return nil

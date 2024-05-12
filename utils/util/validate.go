@@ -65,7 +65,7 @@ func ValidateListBook(c *gin.Context) (int, int, string, string, error) {
 
 func ValidateBook(c *gin.Context, book *entity.Book) error {
 	if book.Title == "" ||
-		book.Publisher == "" ||
+		book.PublisherID == 0 ||
 		book.ListPrice == 0 ||
 		book.PublicationYear == 0 ||
 		len(*book.Authors) == 0 ||
@@ -80,8 +80,7 @@ func ValidateBook(c *gin.Context, book *entity.Book) error {
 
 func ValidateAuthors(c *gin.Context, authors *[]entity.Author) error {
 	for _, a := range *authors {
-		if a.FirstName == "" ||
-			a.LastName == "" {
+		if a.ID == 0 {
 			lg.WithContext(c).Warn(constant.ResponseInvalidArgumentMessage)
 			return er.WithContextError(
 				c,
