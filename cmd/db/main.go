@@ -67,7 +67,7 @@ func migrateDB(db *gorm.DB) error {
 }
 
 func connectToDB() (*gorm.DB, error) {
-	dns := constant.ProgramDatabaseDirectory
+	dns := constant.ProgramDatabaseMigrationDirectory
 
 	db, err := gorm.Open(sqlite.Open(dns), &gorm.Config{})
 	if err != nil {

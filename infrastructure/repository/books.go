@@ -1,0 +1,150 @@
+package repository
+
+import (
+	"fmt"
+	"net/http"
+	"xyz-books/constant"
+	"xyz-books/entity"
+	"xyz-books/infrastructure/repository/dao"
+	te "xyz-books/infrastructure/repository/to_entity"
+	sq "xyz-books/infrastructure/sqlite"
+	"xyz-books/usecase/dto"
+	er "xyz-books/utils/error"
+	lg "xyz-books/utils/logger"
+
+	"github.com/gin-gonic/gin"
+)
+
+type BooksRepository struct {
+	con sq.DBClientInterface
+}
+
+func NewBooksRepository(con sq.DBClientInterface) BooksRepository {
+	return BooksRepository{con: con}
+}
+
+func (b BooksRepository) ListBooks(
+	c *gin.Context, length int, page int, sort string, order string,
+) (*[]entity.Book, error) {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
+
+	dbClient := b.con.GetDBClient(c)
+	orderStr := fmt.Sprintf("%s %s", sort, order)
+
+	var books []dao.Book
+	err := dbClient.
+		Preload("Publisher").
+		Preload("Authors").
+		Limit(length).
+		Offset((page - 1) * length).
+		Order(orderStr).
+		Find(&books).
+		Error
+	if err != nil {
+		er.WithError(c,
+			http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+
+		return nil, err
+	}
+
+	bookRecords := te.ToBooks(c, &books)
+
+	return bookRecords, nil
+}
+
+func (b BooksRepository) GetBookByISBN(
+	c *gin.Context, isbn13 string) (*entity.Book, error) {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
+
+	dbClient := b.con.GetDBClient(c)
+
+	var book dao.Book
+	err := dbClient.
+		Preload("Publisher").
+		Preload("Authors").
+		Where("isbn13 = ?", isbn13).
+		First(&book).
+		Error
+	if err != nil {
+		er.WithError(c,
+			http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+
+		return nil, err
+	}
+
+	bookRecord := te.ToBook(c, &book)
+
+	return bookRecord, nil
+}
+
+func (b BooksRepository) EditBook(
+	c *gin.Context, in *dto.EditBookInput) error {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
+
+	dbClient := b.con.GetDBClient(c)
+
+	var publisher dao.Publisher
+	dbf := dbClient.
+		Where("id = ?", in.Book.PublisherID).
+		First(&publisher)
+	if dbf.Error != nil {
+		lg.WithContext(c).Warn(dbf.Error)
+		return er.WithContextError(
+			c, http.StatusBadRequest, "publisher is invalid")
+	}
+
+	var authorsRecords []dao.Author
+	for _, a := range *in.Book.Authors {
+		var author dao.Author
+		dbf := dbClient.
+			Where("id = ?", a.ID).
+			First(&author)
+		if dbf.Error != nil {
+			lg.WithContext(c).Warn(dbf.Error)
+			return er.WithContextError(
+				c, http.StatusBadRequest, "publisher is invalid")
+		}
+		authorsRecords = append(authorsRecords, author)
+	}
+
+	var existingBook dao.Book
+	dbf = dbClient.
+		Where("isbn13 = ?", in.Book.Isbn13).
+		First(&existingBook)
+	if dbf.Error != nil {
+		lg.WithContext(c).Error(dbf.Error)
+		return er.WithContextError(
+			c, http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+	}
+
+	existingBook.Title = in.Book.Title
+	existingBook.Isbn10 = in.Book.Isbn10
+	existingBook.Isbn13 = in.Book.Isbn13
+	existingBook.ListPrice = in.Book.ListPrice
+	existingBook.PublicationYear = in.Book.PublicationYear
+	existingBook.PublisherID = publisher.ID
+	existingBook.ImageUrl = in.Book.ImageUrl
+	existingBook.Edition = in.Book.Edition
+	existingBook.Authors = authorsRecords
+
+	existingBook.Authors = make([]dao.Author, 0)
+	existingBook.Authors = append(existingBook.Authors, authorsRecords...)
+
+	dbu := dbClient.
+		Where("isbn13 = ?", existingBook.Isbn13).
+		Updates(&existingBook)
+	if dbu.Error != nil {
+		lg.WithContext(c).Error(dbu.Error)
+		return er.WithContextError(
+			c, http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+	}
+
+	return nil
+}

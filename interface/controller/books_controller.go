@@ -6,7 +6,7 @@ import (
 	"xyz-books/usecase/dto"
 	"xyz-books/usecase/port"
 	er "xyz-books/utils/error"
-	log "xyz-books/utils/logger"
+	lg "xyz-books/utils/logger"
 	"xyz-books/utils/util"
 
 	"github.com/gin-gonic/gin"
@@ -20,31 +20,43 @@ func NewBookController(in port.BooksInputPort) BooksController {
 	return BooksController{booksInputPort: in}
 }
 
-func (i BooksController) ListBooks(c *gin.Context) {
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksController) ListBooks(c *gin.Context) {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	i.booksInputPort.ListBooks(c)
+	length, page, sort, order, err := util.ValidateListBook(c)
+	if err != nil {
+		return
+	}
+
+	_ = b.booksInputPort.ListBooks(c, &dto.ListBookInput{
+		Length: length,
+		Page:   page,
+		Sort:   sort,
+		Order:  order,
+	})
 }
 
-func (i BooksController) GetBook(c *gin.Context) {
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksController) GetBook(c *gin.Context) {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	id := c.Param("id")
-	i.booksInputPort.GetBook(c, &dto.GetBookInput{
-		Id: id})
+	isbn13 := c.Param("id")
+	_ = b.booksInputPort.GetBook(c, &dto.GetBookInput{
+		Isbn13: isbn13})
 }
 
-func (i BooksController) EditBook(c *gin.Context) {
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksController) EditBook(c *gin.Context) {
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
 	var bookRequirement dto.EditBookInput
 	if err := c.ShouldBindJSON(&bookRequirement.Book); err != nil {
-		log.WithContext(c).Warn(err.Error())
+		lg.WithContext(c).Warn(err.Error())
 		er.WithContextError(
-			c, http.StatusBadRequest, constant.ResponseInvalidArgumentMessage)
+			c, http.StatusBadRequest,
+			constant.ResponseInvalidArgumentMessage,
+		)
 		return
 	}
 
@@ -57,6 +69,10 @@ func (i BooksController) EditBook(c *gin.Context) {
 		return
 	}
 
-	i.booksInputPort.EditBook(c, &dto.EditBookInput{
-		Book: book})
+	isbn13 := c.Param("id")
+	book.Isbn13 = &isbn13
+
+	_ = b.booksInputPort.EditBook(c, &dto.EditBookInput{
+		Book: book,
+	})
 }

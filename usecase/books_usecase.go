@@ -2,52 +2,76 @@ package usecase
 
 import (
 	"xyz-books/constant"
-	"xyz-books/entity"
 	"xyz-books/usecase/dto"
 	"xyz-books/usecase/port"
-	log "xyz-books/utils/logger"
+	"xyz-books/usecase/repository"
+	lg "xyz-books/utils/logger"
 
 	"github.com/gin-gonic/gin"
 )
 
 type BooksUseCase struct {
-	booksPort port.BooksOutputPort
+	booksRepository       repository.BooksRepositoryInterface
+	postProcessRepository repository.PostProcessRepositoryInterface
+	booksPort             port.BooksOutputPort
 }
 
 func NewBookUseCase(
+	br repository.BooksRepositoryInterface,
+	pp repository.PostProcessRepositoryInterface,
 	bp port.BooksOutputPort,
 ) BooksUseCase {
 	return BooksUseCase{
-		booksPort: bp,
+		booksRepository:       br,
+		postProcessRepository: pp,
+		booksPort:             bp,
 	}
 }
 
-func (i BooksUseCase) ListBooks(c *gin.Context) {
-	// close db postprocess
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksUseCase) ListBooks(c *gin.Context, in *dto.ListBookInput,
+) (err error) {
+	defer b.postProcessRepository.Finish(c, &err)
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	books := []entity.Book{}
+	books, err := b.booksRepository.ListBooks(
+		c, in.Length, in.Page, in.Sort, in.Order)
+	if err != nil {
+		return
+	}
 
-	i.booksPort.ListBooks(c, &dto.ListBooksOuput{
-		Books: &books})
+	b.booksPort.ListBooks(c, &dto.ListBooksOuput{
+		Books: books})
+	return
 }
 
-func (i BooksUseCase) GetBook(c *gin.Context, in *dto.GetBookInput) {
-	// close db postprocess
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksUseCase) GetBook(c *gin.Context, in *dto.GetBookInput,
+) (err error) {
+	defer b.postProcessRepository.Finish(c, &err)
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	book := entity.Book{}
+	book, err := b.booksRepository.GetBookByISBN(c, in.Isbn13)
+	if err != nil {
+		return
+	}
 
-	i.booksPort.GetBook(c, &dto.GetBookOutput{
-		Book: &book})
+	b.booksPort.GetBook(c, &dto.GetBookOutput{
+		Book: book})
+	return
 }
 
-func (i BooksUseCase) EditBook(c *gin.Context, in *dto.EditBookInput) {
-	// close db postprocess
-	log.WithContext(c).Info(constant.LogStartMessage)
-	defer log.WithContext(c).Info(constant.LogFinishMessage)
+func (b BooksUseCase) EditBook(c *gin.Context, in *dto.EditBookInput,
+) (err error) {
+	defer b.postProcessRepository.Finish(c, &err)
+	lg.WithContext(c).Info(constant.LogStartMessage)
+	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	i.booksPort.EditBook(c)
+	err = b.booksRepository.EditBook(c, in)
+	if err != nil {
+		return
+	}
+
+	b.booksPort.EditBook(c)
+	return
 }
