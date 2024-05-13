@@ -1,0 +1,3 @@
+<template>
+    XYZ Books
+</template>

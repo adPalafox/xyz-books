@@ -1,47 +1,37 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="common-layout">
+    <el-container>
+      <el-header>
+        <NavMenu />
+        <el-page-header v-if="route.path.startsWith('/book')" @back="goBack">
+          <template #content>
+            <span class="text-large font-600 mr-3"> Title </span>
+          </template>
+        </el-page-header>
+      </el-header>
+      <el-main>
+        <p><strong>Current route path:</strong> {{ $route.fullPath }}</p>
+        <RouterView />
+      </el-main>
+      <el-footer>
+        <Footer />
+      </el-footer>
+    </el-container>
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<script setup>
+import NavMenu from '@/components/template/NavMenu.vue'
+import Footer from '@/components/template/Footer.vue'
+import { useRouter, useRoute } from 'vue-router'
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+const router = useRouter()
+const route = useRoute()
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+const goBack = () => {
+  if (route.path.includes('/edit')) {
+    router.back()
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+  router.push('/')
 }
-</style>
+</script>
