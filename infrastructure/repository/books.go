@@ -98,20 +98,6 @@ func (b BooksRepository) EditBook(
 			c, http.StatusBadRequest, "publisher is invalid")
 	}
 
-	var authorsRecords []dao.Author
-	for _, a := range *in.Book.Authors {
-		var author dao.Author
-		dbf := dbClient.
-			Where("id = ?", a.ID).
-			First(&author)
-		if dbf.Error != nil {
-			lg.WithContext(c).Warn(dbf.Error)
-			return er.WithContextError(
-				c, http.StatusBadRequest, "publisher is invalid")
-		}
-		authorsRecords = append(authorsRecords, author)
-	}
-
 	var existingBook dao.Book
 	dbf = dbClient.
 		Where("isbn13 = ?", in.Book.Isbn13).
@@ -131,10 +117,6 @@ func (b BooksRepository) EditBook(
 	existingBook.PublisherID = publisher.ID
 	existingBook.ImageUrl = in.Book.ImageUrl
 	existingBook.Edition = in.Book.Edition
-	existingBook.Authors = authorsRecords
-
-	existingBook.Authors = make([]dao.Author, 0)
-	existingBook.Authors = append(existingBook.Authors, authorsRecords...)
 
 	dbu := dbClient.
 		Where("isbn13 = ?", existingBook.Isbn13).

@@ -5,12 +5,11 @@
         <NavMenu />
         <el-page-header v-if="route.path.startsWith('/book')" @back="goBack">
           <template #content>
-            <span class="text-large font-600 mr-3"> Title </span>
+            <span class="text-large font-600 mr-3"> {{ route.name }} </span>
           </template>
         </el-page-header>
       </el-header>
       <el-main>
-        <p><strong>Current route path:</strong> {{ $route.fullPath }}</p>
         <RouterView />
       </el-main>
       <el-footer>

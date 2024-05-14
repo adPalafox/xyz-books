@@ -1,72 +1,31 @@
 <template>
-  <button @click="goToBook">Go to Book Page</button>
-  <el-table :data="tableData" style="width: 100%">
-    <el-table-column fixed prop="date" label="Date" width="150" />
-    <el-table-column prop="name" label="Name" width="120" />
-    <el-table-column prop="state" label="State" width="120" />
-    <el-table-column prop="city" label="City" width="120" />
-    <el-table-column prop="address" label="Address" width="600" />
-    <el-table-column prop="zip" label="Zip" width="120" />
-    <el-table-column fixed="right" label="Operations" width="120">
-      <template #default>
-        <el-button link type="primary" size="small" @click="handleClick"> Detail </el-button>
-        <el-button link type="primary" size="small">Edit</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+  <div v-if="books.length > 0">
+    <TableComponent v-bind:books="books" />
+  </div>
+  <div v-else>Loading books...</div>
   <el-pagination background layout="prev, pager, next" :total="30" />
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
+import TableComponent from '@/components/TableComponent.vue'
+import axios from 'axios'
+import { ref } from 'vue'
 
-const router = useRouter()
+const books = ref([])
 
-const goToBook = () => {
-  router.push({ path: '/book' })
-}
-
-const handleClick = () => {
-  console.log('click')
-  router.push({ path: '/book' })
-}
-
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office'
+async function fetchBooks() {
+  try {
+    console.log('fetching books')
+    const response = await axios.get(
+      'http://localhost:8080/v1/api/book/list?length=30&page=1&sort=title&order=asc'
+    )
+    books.value = response.data.data
+    console.log(books.value.data)
+    console.log(typeof books.value)
+  } catch (error) {
+    console.error('Error fetching books:', error)
   }
-]
+}
+
+fetchBooks()
 </script>

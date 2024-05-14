@@ -68,7 +68,6 @@ func ValidateBook(c *gin.Context, book *entity.Book) error {
 		book.PublisherID == 0 ||
 		book.ListPrice == 0 ||
 		book.PublicationYear == 0 ||
-		len(*book.Authors) == 0 ||
 		(book.Isbn10 == nil && book.Isbn13 == nil) {
 		return er.WithContextError(
 			c,
