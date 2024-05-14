@@ -10,7 +10,7 @@ const (
 
 const (
 	ProgramDatabaseMigrationDirectory = "./sqlite.db"
-	ProgramDatabaseAccessDirectory    = "../../sqlite.db"
+	ProgramDatabaseAccessDirectory    = "./sqlite.db"
 	ProgramSeedBookDirectory          = "cmd/db/seeds/books_seed_data.json"
 	ProgramSeedPublisherDirectory     = "cmd/db/seeds/publishers_seed_data.json"
 )
