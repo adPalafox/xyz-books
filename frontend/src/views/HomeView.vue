@@ -41,8 +41,6 @@ const disabled = ref(false)
 
 async function fetchBooks(lengthInput, pageInput, sortInput, orderInput) {
   try {
-    console.log('fetching books')
-
     const baseUrl = 'http://localhost:8080/v1/api/book/list'
     const length = lengthInput
     const page = pageInput
@@ -59,7 +57,6 @@ async function fetchBooks(lengthInput, pageInput, sortInput, orderInput) {
 }
 
 const handleSizeChange = (val) => {
-  console.log(`${val} items per page`)
   fetchBooks(val, currentPage1.value, 'title', 'asc')
 }
 
@@ -79,6 +76,6 @@ fetchBooks(pageSize1.value, currentPage1.value, 'title', 'asc')
 .pagination-wrap {
   display: flex;
   justify-content: end;
-  margin: 32px 64px;
+  margin: 32px 136px;
 }
 </style>

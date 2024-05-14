@@ -110,29 +110,28 @@
                 Authors
               </div>
             </template>
-            No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
+            <ul>
+              <li v-for="author in book.authors" :key="author.id">
+                {{ author.first_name + ' ' + author.last_name }}
+              </li>
+            </ul>
           </el-descriptions-item>
         </el-descriptions>
       </el-col>
     </el-row>
-    <template #footer>Last Edited on: </template>
   </el-card>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { Iphone, Location, OfficeBuilding, Tickets, User } from '@element-plus/icons-vue'
+import { Iphone, Location, OfficeBuilding, Tickets } from '@element-plus/icons-vue'
 const props = defineProps({
   book: Object
 })
 
 const book = props.book
 
-console.log(book)
-
 const size = 'large'
 const iconStyle = 'default'
-
 </script>
 
 <style scoped>

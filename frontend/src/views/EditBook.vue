@@ -1,12 +1,12 @@
 <template>
   <div class="form-wrap">
-    <el-card shadow="never" style="width: 1200px; padding: 42px 36px;">
+    <el-card shadow="never" style="width: 1200px; padding: 42px 36px">
       <el-form
         ref="ruleFormRef"
         :model="ruleForm"
         :rules="rules"
         label-position="right"
-        style="max-width: 800px; margin: 0 auto;"
+        style="max-width: 800px; margin: 0 auto"
         label-width="auto"
         class="demo-ruleForm"
         :size="formSize"
@@ -21,12 +21,6 @@
         <el-form-item label="ISBN 10" prop="isbn_10">
           <el-input v-model="ruleForm.isbn_10" />
         </el-form-item>
-        <el-form-item label="Publisher" prop="publisher">
-          <el-select v-model="ruleForm.publisher" placeholder="Publisher">
-            <el-option label="Zone one" value="shanghai" />
-            <el-option label="Zone two" value="beijing" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="Publication Year" prop="publication_year">
           <el-input v-model="ruleForm.publication_year" />
         </el-form-item>
@@ -35,16 +29,6 @@
         </el-form-item>
         <el-form-item label="Price" prop="price">
           <el-input v-model="ruleForm.price" />
-        </el-form-item>
-        <el-form-item label="Image">
-          <el-upload
-            ref="uploadRef"
-          >
-            <el-button size="default" type="secondary">Select File</el-button>
-            <el-dragger v-if="ruleForm.image_url" multiple="false" :list="{ url: ruleForm.image_url }">
-              <img :src="ruleForm.image_url" alt="Image preview" class="image-preview" />
-            </el-dragger>
-          </el-upload>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm(ruleFormRef)"> Create </el-button>
@@ -56,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import { ComponentSize, FormInstance, FormRules, ElNotification } from 'element-plus'
 import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -73,11 +57,7 @@ interface BookForm {
   publication_year: string
   edition?: string
   price: string
-  image_url?: string
 }
-
-const book = route.params
-console.log(book)
 
 const formSize = ref<ComponentSize>('large')
 const ruleFormRef = ref<FormInstance>()
@@ -92,8 +72,6 @@ const ruleForm = reactive<BookForm>({
   price: route.params.list_price as string
 })
 
-const locationOptions = ['Home', 'Company', 'School']
-
 const rules = reactive<FormRules<BookForm>>({
   title: [{ required: true, message: 'Please input book title', trigger: 'blur' }],
   isbn_13: [
@@ -101,28 +79,6 @@ const rules = reactive<FormRules<BookForm>>({
       required: true,
       message: 'Please enter a valid isbn 13',
       trigger: 'change'
-      // validator: (rule, value: string, callback: (result: boolean) => void) => {
-      //   if (value.length === 0) {
-      //     callback(true) // Allow empty ISBN 13
-      //     return
-      //   }
-
-      //   // Basic ISBN-13 validation (13 digits, check digit)
-      //   const sum = value
-      //     .split('')
-      //     .reverse()
-      //     .reduce((acc, digit, i) => acc + parseInt(digit, 10) * (i % 2 === 0 ? 1 : 3), 0)
-      //   const checkDigit = (10 - (sum % 10)) % 10
-      //   const valid = checkDigit === parseInt(value.charAt(12), 10)
-
-      //   if (valid) {
-      //     callback(true)
-      //   } else {
-      //     console.log(checkDigit)
-      //     console.log(value)
-      //     callback(new Error('Invalid ISBN-13 format'))
-      //   }
-      // }
     }
   ],
   isbn_10: [
@@ -130,45 +86,19 @@ const rules = reactive<FormRules<BookForm>>({
       required: false,
       message: 'Please enter a valid isbn 10',
       trigger: 'change'
-      // validator: (rule, value: string, callback: (result: boolean) => void) => {
-      //   if (value.length === 0) {
-      //     callback(true) // Allow empty ISBN 10
-      //     return
-      //   }
-
-      //   // Basic ISBN-10 validation (10 digits, check digit)
-      //   // Replace with a more comprehensive ISBN-10 validation library if needed
-      //   const sum = value
-      //     .split('')
-      //     .reverse()
-      //     .slice(0, 9)
-      //     .reduce((acc, digit, i) => acc + parseInt(digit, 10) * (i + 1), 0)
-      //   const checkDigit = (11 - (sum % 11)) % 11
-      //   const validCheckDigit = checkDigit === 10 ? 'X' : checkDigit.toString()
-      //   const valid = validCheckDigit === value.charAt(9).toUpperCase()
-
-      //   if (valid) {
-      //     callback(true)
-      //   } else {
-      //     console.log(checkDigit)
-      //     console.log(value)
-      //     callback(new Error('Invalid ISBN-10 format'))
-      //   }
-      // }
     }
   ],
   publisher: [
     {
       required: true,
-      message: 'Please select Activity count',
+      message: 'Please select publisher',
       trigger: 'blur'
     }
   ],
   publication_year: [
     {
-      type: 'date',
       required: true,
-      message: 'Please pick a date',
+      message: 'Please enter valid year',
       trigger: 'change'
     }
   ],
@@ -180,7 +110,7 @@ const rules = reactive<FormRules<BookForm>>({
   price: [
     {
       required: true,
-      message: 'Please select a location',
+      message: 'Please enter a valid price',
       trigger: 'change'
     }
   ]
@@ -197,7 +127,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           title: ruleForm.title,
           isbn_13: ruleForm.isbn_13,
           isbn_10: ruleForm.isbn_10,
-          list_price: parseFloat(ruleForm.price), // Assuming 'price' is intended for list_price
+          list_price: parseFloat(ruleForm.price),
           publication_year: parseInt(ruleForm.publication_year, 10),
           publisher: ruleForm.publisher,
           edition: ruleForm.edition
@@ -209,16 +139,46 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         )
 
         if (response.status === 200) {
-          console.log('Book updated successfully!', response.data)
+          const success = (message: string) => {
+            ElNotification({
+              title: 'Success',
+              message: message,
+              type: 'success'
+            })
+          }
+          success('Book updated successfully!')
           router.push('/book/' + ruleForm.isbn_13)
         } else {
-          console.error('Error updating book:', response.data)
+          const fail = (message: string) => {
+            ElNotification({
+              title: 'Error',
+              message: message,
+              type: 'error'
+            })
+          }
+          fail('Error updating book')
         }
       } catch (error) {
         console.error('Error submitting form:', error)
+        const fail = (message: string) => {
+          ElNotification({
+            title: 'Error',
+            message: message,
+            type: 'error'
+          })
+        }
+        fail('Error updating book')
       }
     } else {
       console.log('error submit!', fields)
+      const fail = (message: string) => {
+        ElNotification({
+          title: 'Error',
+          message: message,
+          type: 'error'
+        })
+      }
+      fail('Error updating book')
     }
   })
 }
@@ -227,11 +187,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
-
-const options = Array.from({ length: 10000 }).map((_, idx) => ({
-  value: `${idx + 1}`,
-  label: `${idx + 1}`
-}))
 </script>
 
 <style scoped>
