@@ -65,10 +65,6 @@ func (b BooksController) EditBook(c *gin.Context) {
 		return
 	}
 
-	if err := util.ValidateAuthors(c, book.Authors); err != nil {
-		return
-	}
-
 	isbn13 := c.Param("id")
 	book.Isbn13 = &isbn13
 

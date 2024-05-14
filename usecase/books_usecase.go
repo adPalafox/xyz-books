@@ -34,14 +34,16 @@ func (b BooksUseCase) ListBooks(c *gin.Context, in *dto.ListBookInput,
 	lg.WithContext(c).Info(constant.LogStartMessage)
 	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
-	books, err := b.booksRepository.ListBooks(
+	books, count, err := b.booksRepository.ListBooks(
 		c, in.Length, in.Page, in.Sort, in.Order)
 	if err != nil {
 		return
 	}
 
 	b.booksPort.ListBooks(c, &dto.ListBooksOuput{
-		Books: books})
+		Books:      books,
+		TotalCount: count,
+	})
 	return
 }
 

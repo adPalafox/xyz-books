@@ -25,15 +25,26 @@ func NewBooksRepository(con sq.DBClientInterface) BooksRepository {
 
 func (b BooksRepository) ListBooks(
 	c *gin.Context, length int, page int, sort string, order string,
-) (*[]entity.Book, error) {
+) (*[]entity.Book, int64, error) {
 	lg.WithContext(c).Info(constant.LogStartMessage)
 	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
 	dbClient := b.con.GetDBClient(c)
 	orderStr := fmt.Sprintf("%s %s", sort, order)
 
+	var count int64
+	err := dbClient.Model(&dao.Book{}).
+		Count(&count).
+		Error
+	if err != nil {
+		er.WithError(c,
+			http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+		return nil, 0, err
+	}
+
 	var books []dao.Book
-	err := dbClient.
+	err = dbClient.
 		Preload("Publisher").
 		Preload("Authors").
 		Limit(length).
@@ -45,13 +56,12 @@ func (b BooksRepository) ListBooks(
 		er.WithError(c,
 			http.StatusInternalServerError,
 			constant.ResponseInternalServerMessage)
-
-		return nil, err
+		return nil, 0, err
 	}
 
 	bookRecords := te.ToBooks(c, &books)
 
-	return bookRecords, nil
+	return bookRecords, count, nil
 }
 
 func (b BooksRepository) GetBookByISBN(
@@ -98,20 +108,6 @@ func (b BooksRepository) EditBook(
 			c, http.StatusBadRequest, "publisher is invalid")
 	}
 
-	var authorsRecords []dao.Author
-	for _, a := range *in.Book.Authors {
-		var author dao.Author
-		dbf := dbClient.
-			Where("id = ?", a.ID).
-			First(&author)
-		if dbf.Error != nil {
-			lg.WithContext(c).Warn(dbf.Error)
-			return er.WithContextError(
-				c, http.StatusBadRequest, "publisher is invalid")
-		}
-		authorsRecords = append(authorsRecords, author)
-	}
-
 	var existingBook dao.Book
 	dbf = dbClient.
 		Where("isbn13 = ?", in.Book.Isbn13).
@@ -131,10 +127,6 @@ func (b BooksRepository) EditBook(
 	existingBook.PublisherID = publisher.ID
 	existingBook.ImageUrl = in.Book.ImageUrl
 	existingBook.Edition = in.Book.Edition
-	existingBook.Authors = authorsRecords
-
-	existingBook.Authors = make([]dao.Author, 0)
-	existingBook.Authors = append(existingBook.Authors, authorsRecords...)
 
 	dbu := dbClient.
 		Where("isbn13 = ?", existingBook.Isbn13).

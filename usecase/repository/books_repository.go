@@ -8,7 +8,7 @@ import (
 )
 
 type BooksRepositoryInterface interface {
-	ListBooks(*gin.Context, int, int, string, string) (*[]entity.Book, error)
+	ListBooks(*gin.Context, int, int, string, string) (*[]entity.Book, int64, error)
 	GetBookByISBN(*gin.Context, string) (*entity.Book, error)
 	EditBook(*gin.Context, *dto.EditBookInput) error
 }
