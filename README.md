@@ -35,4 +35,29 @@ npm run dev
 Similarly, please ensure that the port 5173 is available, otherwise the frontend will not be able to make requests to the backend even if the frontend server will run on another port in case it is occupied.
 Port 5173 is used by the frontend local server while port 8080 should be occupied by the backend.
 
+## Testing
+Mockgen tool is used to mock the interfaces
+Install the mockgen tool.
+```
+go install go.uber.org/mock/mockgen@latest
+```
+To ensure it was installed correctly, use:
+
+```
+mockgen -version
+```
+If that fails, make sure your GOPATH/bin is in your PATH. You can add it with:
+```
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+You can then prepare the mocks with:
+```
+make prepare-mock
+```
+and run the tests with:
+```
+make unit-test
+```
+
 Also please make sure to perform the commands under the project directory
+
