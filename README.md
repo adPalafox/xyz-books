@@ -34,3 +34,5 @@ npm run dev
 ```
 Similarly, please ensure that the port 5173 is available, otherwise the frontend will not be able to make requests to the backend even if the frontend server will run on another port in case it is occupied.
 Port 5173 is used by the frontend local server while port 8080 should be occupied by the backend.
+
+Also please make sure to perform the commands under the project directory
