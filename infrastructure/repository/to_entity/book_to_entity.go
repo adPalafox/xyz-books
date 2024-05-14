@@ -22,7 +22,6 @@ func ToBook(c *gin.Context, in *dao.Book) *entity.Book {
 		Isbn13:          in.Isbn13,
 		ListPrice:       in.ListPrice,
 		PublicationYear: in.PublicationYear,
-		PublisherID:     in.Publisher.ID,
 		Publisher:       in.Publisher.Name,
 		ImageUrl:        in.ImageUrl,
 		Edition:         in.Edition,

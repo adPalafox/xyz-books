@@ -1,70 +1,37 @@
 <template>
-  <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false" @select="handleSelect">
-    <!-- <img
-          style="width: 100px"
-          src="/images/element-plus-logo.svg"
-          alt="Element logo"
-        /> -->
-    <div>
-      XYZ Books
-    </div>
-
-    <el-autocomplete v-model="state2" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable
-      class="inline-input w-50" placeholder="Please Input" @select="handleSelect" />
+  <el-menu class="el-menu" mode="horizontal" :ellipsis="false" @select="handleSelect">
+    <el-row justify="space-evenly" :gutter="10">
+      <el-col :span="8" :md="8">
+        <router-link to="/">
+          <img style="width: 190px" src="../../assets/xyz-logo-text.svg" alt="XYZ Books logo" />
+        </router-link>
+      </el-col>
+      <!-- I am sorry I have no time to implement search-->
+    </el-row>
   </el-menu>
 </template>
-  
-  
-<style>
-.flex-grow {
-  flex-grow: 1;
-}
-</style>
-  
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
-interface RestaurantItem {
-  value: string
-  link: string
+interface Book {
+  title: string
+  isbn_13: string
+  publisher: string
+  publication_year: string
+  authors: string
 }
 
-const state1 = ref('')
-const state2 = ref('')
+const selectedBook = ref<Book | null>(null)
 
-const restaurants = ref<RestaurantItem[]>([])
-const querySearch = (queryString: string, cb: any) => {
-  const results = queryString
-    ? restaurants.value.filter(createFilter(queryString))
-    : restaurants.value
-  // call callback function to return suggestions
-  cb(results)
+const handleSelect = (item: Book) => {
+  selectedBook.value = item
 }
-const createFilter = (queryString: string) => {
-  return (restaurant: RestaurantItem) => {
-    return (
-      restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-    )
-  }
-}
-const loadAll = () => {
-  return [
-    { value: 'vue', link: 'https://github.com/vuejs/vue' },
-    { value: 'element', link: 'https://github.com/ElemeFE/element' },
-    { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-    { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-    { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-    { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-    { value: 'babel', link: 'https://github.com/babel/babel' },
-  ]
-}
-
-const handleSelect = (item: RestaurantItem) => {
-  console.log(item)
-}
-
-onMounted(() => {
-  restaurants.value = loadAll()
-})
 </script>
+
+<style scoped>
+.el-menu {
+  margin-top: 32px;
+  display: block !important;
+}
+</style>

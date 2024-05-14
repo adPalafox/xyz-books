@@ -100,7 +100,7 @@ func (b BooksRepository) EditBook(
 
 	var publisher dao.Publisher
 	dbf := dbClient.
-		Where("id = ?", in.Book.PublisherID).
+		Where("name = ?", in.Book.Publisher).
 		First(&publisher)
 	if dbf.Error != nil {
 		lg.WithContext(c).Warn(dbf.Error)

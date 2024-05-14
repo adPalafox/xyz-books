@@ -65,7 +65,7 @@ func ValidateListBook(c *gin.Context) (int, int, string, string, error) {
 
 func ValidateBook(c *gin.Context, book *entity.Book) error {
 	if book.Title == "" ||
-		book.PublisherID == 0 ||
+		book.Publisher == "" ||
 		book.ListPrice == 0 ||
 		book.PublicationYear == 0 ||
 		(book.Isbn10 == nil && book.Isbn13 == nil) {
