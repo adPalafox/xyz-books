@@ -58,3 +58,6 @@ and run the tests with:
 ```
 make unit-test
 ```
+
+Also please make sure to perform the commands under the project directory
+
