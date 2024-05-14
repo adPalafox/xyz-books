@@ -1,6 +1,8 @@
 <template>
-  <BookCard v-if="book" :book="book" />
-  <div v-else>Loading books...</div>
+  <div class="book-card-wrap">
+    <BookCard v-if="book" :book="book" />
+    <div v-else>Loading books...</div>
+  </div>
 </template>
 
 <script setup>
@@ -27,3 +29,11 @@ async function fetchBook(isbn13) {
 
 fetchBook(route.params.isbn_13)
 </script>
+
+<style scoped>
+.book-card-wrap {
+  margin: 64px 32px;
+  display: flex;
+  justify-content: center;
+}
+</style>

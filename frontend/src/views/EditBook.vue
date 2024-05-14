@@ -1,44 +1,57 @@
 <template>
-  <div>
-    <el-form
-      ref="ruleFormRef"
-      style="max-width: 600px"
-      :model="ruleForm"
-      :rules="rules"
-      label-width="auto"
-      class="demo-ruleForm"
-      :size="formSize"
-      status-icon
-    >
-      <el-form-item label="Title" prop="title">
-        <el-input v-model="ruleForm.title" />
-      </el-form-item>
-      <el-form-item label="ISBN 13" prop="isbn_13">
-        <el-input v-model="ruleForm.isbn_13" />
-      </el-form-item>
-      <el-form-item label="ISBN 10" prop="isbn_10">
-        <el-input v-model="ruleForm.isbn_10" />
-      </el-form-item>
-      <el-form-item label="Publisher" prop="publisher">
-        <el-select v-model="ruleForm.publisher" placeholder="Publisher">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Publication Year" prop="publication_year">
-        <el-input v-model="ruleForm.publication_year" />
-      </el-form-item>
-      <el-form-item label="Edition" prop="edition">
-        <el-input v-model="ruleForm.edition" />
-      </el-form-item>
-      <el-form-item label="Price" prop="price">
-        <el-input v-model="ruleForm.price" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)"> Create </el-button>
-        <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="form-wrap">
+    <el-card shadow="never" style="width: 1200px; padding: 42px 36px;">
+      <el-form
+        ref="ruleFormRef"
+        :model="ruleForm"
+        :rules="rules"
+        label-position="right"
+        style="max-width: 800px; margin: 0 auto;"
+        label-width="auto"
+        class="demo-ruleForm"
+        :size="formSize"
+        status-icon
+      >
+        <el-form-item label="Title" prop="title">
+          <el-input v-model="ruleForm.title" />
+        </el-form-item>
+        <el-form-item label="ISBN 13" prop="isbn_13">
+          <el-input v-model="ruleForm.isbn_13" />
+        </el-form-item>
+        <el-form-item label="ISBN 10" prop="isbn_10">
+          <el-input v-model="ruleForm.isbn_10" />
+        </el-form-item>
+        <el-form-item label="Publisher" prop="publisher">
+          <el-select v-model="ruleForm.publisher" placeholder="Publisher">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Publication Year" prop="publication_year">
+          <el-input v-model="ruleForm.publication_year" />
+        </el-form-item>
+        <el-form-item label="Edition" prop="edition">
+          <el-input v-model="ruleForm.edition" />
+        </el-form-item>
+        <el-form-item label="Price" prop="price">
+          <el-input v-model="ruleForm.price" />
+        </el-form-item>
+        <el-form-item label="Image">
+          <el-upload
+            ref="uploadRef"
+          >
+            <el-button size="default" type="secondary">Select File</el-button>
+            <el-dragger v-if="ruleForm.image_url" multiple="false" :list="{ url: ruleForm.image_url }">
+              <img :src="ruleForm.image_url" alt="Image preview" class="image-preview" />
+            </el-dragger>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm(ruleFormRef)"> Create </el-button>
+          <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
@@ -56,24 +69,23 @@ interface BookForm {
   title: string
   isbn_13: string
   isbn_10: string
-  publisher_id: string
   publisher: string
   publication_year: string
-  edition: string
+  edition?: string
   price: string
+  image_url?: string
 }
 
 const book = route.params
 console.log(book)
 
-const formSize = ref<ComponentSize>('default')
+const formSize = ref<ComponentSize>('large')
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive<BookForm>({
   id: route.params.id as string,
   title: route.params.title as string,
   isbn_13: route.params.isbn_13 as string,
   isbn_10: route.params.isbn_10 as string,
-  publisher_id: route.params.publisher_id as string,
   publisher: route.params.publisher as string,
   publication_year: route.params.publication_year as string,
   edition: route.params.edition as string,
@@ -186,9 +198,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           isbn_13: ruleForm.isbn_13,
           isbn_10: ruleForm.isbn_10,
           list_price: parseFloat(ruleForm.price), // Assuming 'price' is intended for list_price
-          publisher_id: parseInt(ruleForm.publisher_id, 10),
           publication_year: parseInt(ruleForm.publication_year, 10),
-          publisher: ruleForm.publisher
+          publisher: ruleForm.publisher,
+          edition: ruleForm.edition
         }
 
         const response = await axios.patch(
@@ -221,3 +233,11 @@ const options = Array.from({ length: 10000 }).map((_, idx) => ({
   label: `${idx + 1}`
 }))
 </script>
+
+<style scoped>
+.form-wrap {
+  margin: 64px 32px;
+  display: flex;
+  justify-content: center;
+}
+</style>

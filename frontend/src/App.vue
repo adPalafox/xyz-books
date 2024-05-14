@@ -3,17 +3,21 @@
     <el-container>
       <el-header>
         <NavMenu />
-        <el-page-header v-if="route.path.startsWith('/book')" @back="goBack">
+        <el-page-header style="margin-top: 16px;" v-if="route.path.startsWith('/book')" @back="goBack">
           <template #content>
             <span class="text-large font-600 mr-3"> {{ route.name }} </span>
           </template>
         </el-page-header>
       </el-header>
-      <el-main>
-        <RouterView />
-      </el-main>
+      <div class="main-body">
+        <el-main>
+          <RouterView />
+        </el-main>
+      </div>
       <el-footer>
-        <Footer />
+        <div class="footer">
+          <Footer />
+        </div>
       </el-footer>
     </el-container>
   </div>
@@ -34,3 +38,14 @@ const goBack = () => {
   router.push('/')
 }
 </script>
+<style scoped>
+.main-body {
+  margin-top: 42px;
+  min-height: 100vh;
+}
+.footer {
+  border-top: 1px solid #dcdfe6;
+  display: flex;
+  flex-direction: column;
+}
+</style>

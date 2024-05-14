@@ -8,7 +8,7 @@ const routes = [
   { name: 'Home', path: '/', component: HomeView },
   { name: 'Book', path: '/book/:isbn_13', component: BookView },
   { name: 'Edit', 
-    path: '/book/:isbn_13/edit/:isbn_10/:id/:title/:publisher_id/:publisher/:publication_year/:edition?/:list_price', 
+    path: '/book/:isbn_13/edit/:isbn_10?/:id/:title/:publisher/:publication_year/:edition?/:list_price/:image_url?', 
     component: EditBook },
 ]
 
