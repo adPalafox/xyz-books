@@ -26,9 +26,7 @@ const props = defineProps({
 })
 
 const handleClick = (selectedRow) => {
-  console.log(selectedRow.isbn_13)
   router.push('/book/' + selectedRow.isbn_13)
 }
 
-console.log(props.books[0].authors)
 </script>

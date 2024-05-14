@@ -25,15 +25,26 @@ func NewBooksRepository(con sq.DBClientInterface) BooksRepository {
 
 func (b BooksRepository) ListBooks(
 	c *gin.Context, length int, page int, sort string, order string,
-) (*[]entity.Book, error) {
+) (*[]entity.Book, int64, error) {
 	lg.WithContext(c).Info(constant.LogStartMessage)
 	defer lg.WithContext(c).Info(constant.LogFinishMessage)
 
 	dbClient := b.con.GetDBClient(c)
 	orderStr := fmt.Sprintf("%s %s", sort, order)
 
+	var count int64
+	err := dbClient.Model(&dao.Book{}).
+		Count(&count).
+		Error
+	if err != nil {
+		er.WithError(c,
+			http.StatusInternalServerError,
+			constant.ResponseInternalServerMessage)
+		return nil, 0, err
+	}
+
 	var books []dao.Book
-	err := dbClient.
+	err = dbClient.
 		Preload("Publisher").
 		Preload("Authors").
 		Limit(length).
@@ -45,13 +56,12 @@ func (b BooksRepository) ListBooks(
 		er.WithError(c,
 			http.StatusInternalServerError,
 			constant.ResponseInternalServerMessage)
-
-		return nil, err
+		return nil, 0, err
 	}
 
 	bookRecords := te.ToBooks(c, &books)
 
-	return bookRecords, nil
+	return bookRecords, count, nil
 }
 
 func (b BooksRepository) GetBookByISBN(

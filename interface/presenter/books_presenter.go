@@ -17,7 +17,8 @@ func NewBooksPresenter() *BooksPresenter {
 
 func (i BooksPresenter) ListBooks(c *gin.Context, in *dto.ListBooksOuput) {
 	c.JSON(http.StatusOK, gin.H{
-		"data": in.Books,
+		"data":        in.Books,
+		"total_count": in.TotalCount,
 	})
 }
 
